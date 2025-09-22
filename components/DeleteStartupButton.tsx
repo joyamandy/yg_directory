@@ -1,19 +1,19 @@
 "use client";
 
-import { deleteStartup } from "@/lib/actions";
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { deleteStartup } from "@/lib/actions";
 
 export default function DeleteStartupButton({ startupId }: { startupId: string }) {
-  const [isPending, startTransition] = useTransition();
   const router = useRouter();
+  const [isPending, startTransition] = useTransition();
 
   const handleDelete = () => {
+    if (!confirm("Are you sure you want to delete this startup?")) return;
+
     startTransition(async () => {
-      const res = await deleteStartup(startupId);
-      if (res.status === "SUCCESS") {
-        router.push("/"); // go back to home after deleting
-      }
+      await deleteStartup(startupId);
+      router.push("/");
     });
   };
 
@@ -21,7 +21,7 @@ export default function DeleteStartupButton({ startupId }: { startupId: string }
     <button
       onClick={handleDelete}
       disabled={isPending}
-      className="bg-red-500 text-white px-4 py-2 rounded mt-4 hover:bg-red-600 disabled:opacity-50"
+      className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50"
     >
       {isPending ? "Deleting..." : "Delete Startup"}
     </button>

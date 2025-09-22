@@ -5,6 +5,9 @@ import { parseServerActionResponse } from "@/lib/utils";
 import slugify from "slugify";
 import { writeClient } from "@/sanity/lib/write-client";
 
+/**
+ * Create a Pitch (Startup)
+ */
 export const createPitch = async (
   state: any,
   form: FormData,
@@ -26,12 +29,13 @@ export const createPitch = async (
 
   try {
     const startup = {
+      _type: "startup",
       title,
       description,
       category,
       image: link,
       slug: {
-        _type: slug,
+        _type: "slug",
         current: slug,
       },
       author: {
@@ -41,7 +45,7 @@ export const createPitch = async (
       pitch,
     };
 
-    const result = await writeClient.create({ _type: "startup", ...startup });
+    const result = await writeClient.create(startup);
 
     return parseServerActionResponse({
       ...result,
@@ -49,7 +53,7 @@ export const createPitch = async (
       status: "SUCCESS",
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
 
     return parseServerActionResponse({
       error: JSON.stringify(error),
@@ -57,3 +61,13 @@ export const createPitch = async (
     });
   }
 };
+
+export async function deleteStartup(id: string) {
+  try {
+    await writeClient.delete(id);
+    return { success: true };
+  } catch (error) {
+    console.error(error);
+    return { success: false, error };
+  }
+}

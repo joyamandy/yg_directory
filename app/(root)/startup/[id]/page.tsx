@@ -1,4 +1,4 @@
-export const experimental_ppr = true;
+//export const experimental_ppr = true;
 
 import Link from "next/link";
 import Image from "next/image";
@@ -11,20 +11,18 @@ import md from "@/lib/markdown";
 import StartupCard, { StartupTypeCard } from "@/components/StartupCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import View from "@/components/View";
+import DeleteStartupButton from "@/components/DeleteStartupButton"; // ⬅️ added
 
 const Page = async ({ params }: { params: Promise<{ id: string }> }) => {
   const { id } = await params;
 
-  // Run queries in parallel
   const [post, playlist] = await Promise.all([
     client.fetch(STARTUP_BY_ID_QUERY, { id }),
     client.fetch(PLAYLIST_BY_SLUG_QUERY, { slug: "editor-picks-new" }),
   ]);
 
-  // Handle missing post
   if (!post) return notFound();
 
-  // Safe fallback if playlist is null or has no "select"
   const editorPosts: StartupTypeCard[] = playlist?.select ?? [];
 
   const parsedContent = md.render(post?.pitch || "");
@@ -79,6 +77,10 @@ const Page = async ({ params }: { params: Promise<{ id: string }> }) => {
           ) : (
             <p className="no-result">No details provided</p>
           )}
+
+          <div className="mt-6">
+            <DeleteStartupButton startupId={post._id} />
+          </div>
         </div>
 
         <hr className="divider" />
